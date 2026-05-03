@@ -144,3 +144,10 @@ async def run_demo(req: DemoRequest):
     scenario_map = {1: ("pt-001", "cond-001"), 2: ("pt-002", "cond-002"), 3: ("pt-003", "cond-003")}
     patient_id, condition_id = scenario_map.get(req.scenario, ("pt-001", "cond-001"))
     return await run_triage(TriageRequest(patient_id=patient_id, condition_id=condition_id))
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("api.main:app", host="0.0.0.0", port=port)
