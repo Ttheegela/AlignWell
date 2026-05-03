@@ -1,0 +1,360 @@
+{
+  "name": "AlignWell Triage Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alignwell-triage",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Triage Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "alignwell-triage"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://alignwell-app-production.up.railway.app/demo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "scenario",
+              "value": "={{ $json.body.scenario ?? 1 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-request-node",
+      "name": "Call AlignWell API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.scheduler_action }}",
+                    "rightValue": "escalated",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "escalated"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.scheduler_action }}",
+                    "rightValue": "booked",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "booked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.scheduler_action }}",
+                    "rightValue": "waitlisted",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "waitlisted"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "switch-node",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "esc-status",
+              "name": "status",
+              "value": "EMERGENCY_ESCALATION",
+              "type": "string"
+            },
+            {
+              "id": "esc-patient",
+              "name": "patient",
+              "value": "={{ $('Call AlignWell API').item.json.patient_name }}",
+              "type": "string"
+            },
+            {
+              "id": "esc-esi",
+              "name": "esi_level",
+              "value": "={{ $('Call AlignWell API').item.json.esi_level }}",
+              "type": "number"
+            },
+            {
+              "id": "esc-msg",
+              "name": "alert",
+              "value": "={{ $('Call AlignWell API').item.json.provider_message }}",
+              "type": "string"
+            },
+            {
+              "id": "esc-patient-msg",
+              "name": "patient_message",
+              "value": "={{ $('Call AlignWell API').item.json.patient_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "escalation-node",
+      "name": "Format Escalation Alert",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 160]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "book-status",
+              "name": "status",
+              "value": "APPOINTMENT_BOOKED",
+              "type": "string"
+            },
+            {
+              "id": "book-patient",
+              "name": "patient",
+              "value": "={{ $('Call AlignWell API').item.json.patient_name }}",
+              "type": "string"
+            },
+            {
+              "id": "book-appt",
+              "name": "appointment_id",
+              "value": "={{ $('Call AlignWell API').item.json.appointment_id }}",
+              "type": "string"
+            },
+            {
+              "id": "book-time",
+              "name": "appointment_start",
+              "value": "={{ $('Call AlignWell API').item.json.appointment_start }}",
+              "type": "string"
+            },
+            {
+              "id": "book-msg",
+              "name": "patient_message",
+              "value": "={{ $('Call AlignWell API').item.json.patient_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "booked-node",
+      "name": "Format Booking Confirmation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "wait-status",
+              "name": "status",
+              "value": "ADDED_TO_WAITLIST",
+              "type": "string"
+            },
+            {
+              "id": "wait-patient",
+              "name": "patient",
+              "value": "={{ $('Call AlignWell API').item.json.patient_name }}",
+              "type": "string"
+            },
+            {
+              "id": "wait-esi",
+              "name": "esi_level",
+              "value": "={{ $('Call AlignWell API').item.json.esi_level }}",
+              "type": "number"
+            },
+            {
+              "id": "wait-msg",
+              "name": "patient_message",
+              "value": "={{ $('Call AlignWell API').item.json.patient_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "waitlisted-node",
+      "name": "Format Waitlist Notice",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-node",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Triage Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call AlignWell API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call AlignWell API": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "main": [
+        [
+          {
+            "node": "Format Escalation Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Booking Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Waitlist Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Escalation Alert": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Booking Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Waitlist Notice": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-05-03T00:00:00.000Z",
+  "versionId": "1"
+}
