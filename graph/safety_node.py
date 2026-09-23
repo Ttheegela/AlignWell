@@ -1,72 +1,40 @@
-"""
-Safety / verification stub for AlignWell triage state.
+"""Safety / verification node stub for AlignWell triage graph.
 
-Pure Python — no LangGraph import required. Callers can wire
-`verify_triage` as a node later (see UPGRADE_V1.md).
+Pure Python — no LangGraph import required. Wire into graph/workflow.py later.
 """
-
 from __future__ import annotations
 
-from typing import Any
-
-# Keys treated as obvious PHI for redaction in this stub.
-_PHI_KEYS = frozenset({"name", "ssn", "mrn"})
+PHI_KEYS = ("name", "ssn", "mrn", "date_of_birth", "phone", "email", "address")
 
 
 def verify_triage(state: dict) -> dict:
-    """
-    Verify a triage state dict and return a shallow merge with `verification`.
-
-    Rules (stub, not clinical CDS):
-      - Strip/redact obvious PHI keys (name, ssn, mrn) → phi_redacted=True
-      - esi_level must be in 1..5 else safe=False, block_reason="invalid_esi"
-      - ESI 1 or 2 requires escalation=True else safe=False
-    """
-    if not isinstance(state, dict):
-        raise TypeError("state must be a dict")
-
-    out: dict[str, Any] = dict(state)
+    """Validate ESI + escalation; redact obvious PHI keys; return verification block."""
+    out = dict(state or {})
     phi_redacted = False
-
     for key in list(out.keys()):
-        if key.lower() in _PHI_KEYS:
+        if key.lower() in PHI_KEYS or key.lower().endswith("_name"):
             out.pop(key, None)
             phi_redacted = True
 
-    # Also redact nested patient-ish dicts when present
-    patient = out.get("patient")
-    if isinstance(patient, dict):
-        cleaned = dict(patient)
-        for key in list(cleaned.keys()):
-            if key.lower() in _PHI_KEYS:
-                cleaned.pop(key, None)
-                phi_redacted = True
-        out["patient"] = cleaned
-
+    esi = out.get("esi_level")
     safe = True
-    block_reason: str | None = None
-
-    raw_esi = out.get("esi_level")
+    block_reason = None
     try:
-        esi = int(raw_esi) if raw_esi is not None else None
+        esi_i = int(esi)
     except (TypeError, ValueError):
-        esi = None
-
-    if esi is None or esi not in (1, 2, 3, 4, 5):
+        esi_i = None
+    if esi_i is None or esi_i not in (1, 2, 3, 4, 5):
         safe = False
         block_reason = "invalid_esi"
-    elif esi in (1, 2):
-        escalation = out.get("escalation")
-        if escalation is not True:
-            safe = False
-            block_reason = "esi_1_2_requires_escalation"
+    elif esi_i in (1, 2) and not out.get("escalation"):
+        safe = False
+        block_reason = "esi_1_2_requires_escalation"
 
     out["verification"] = {
         "safe": safe,
         "block_reason": block_reason,
         "phi_redacted": phi_redacted,
+        "esi_level": esi_i,
     }
+    out["safe"] = safe
     return out
-
-
-__all__ = ["verify_triage"]
