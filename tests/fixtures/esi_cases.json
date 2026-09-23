@@ -1,0 +1,44 @@
+[
+  {
+    "id": "case_chest_pain",
+    "complaint": "Chest pain with diaphoresis",
+    "expected_esi": 2,
+    "notes": "README demo scenario 1 — emergent, escalate"
+  },
+  {
+    "id": "case_knee_pain",
+    "complaint": "Chronic knee pain",
+    "expected_esi": 4,
+    "notes": "README demo scenario 2 — less urgent, book"
+  },
+  {
+    "id": "case_fever",
+    "complaint": "Fever 38.9 C for two days, otherwise stable",
+    "expected_esi": 4,
+    "notes": "README demo scenario 3 — ESI 4–5 band; fixture uses 4"
+  },
+  {
+    "id": "case_cardiac_arrest",
+    "complaint": "Unresponsive, no pulse, CPR in progress",
+    "expected_esi": 1,
+    "notes": "Immediate / life-threatening"
+  },
+  {
+    "id": "case_minor_laceration",
+    "complaint": "Small finger laceration, bleeding controlled",
+    "expected_esi": 5,
+    "notes": "Non-urgent, one simple resource or none"
+  },
+  {
+    "id": "case_abdominal_pain",
+    "complaint": "Severe abdominal pain, needs labs and imaging",
+    "expected_esi": 3,
+    "notes": "Urgent, multiple resources expected"
+  },
+  {
+    "id": "case_shortness_of_breath",
+    "complaint": "Sudden shortness of breath and chest tightness",
+    "expected_esi": 2,
+    "notes": "High-risk respiratory / cardiac presentation"
+  }
+]
