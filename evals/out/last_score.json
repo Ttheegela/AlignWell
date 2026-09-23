@@ -1,0 +1,59 @@
+{
+  "n_cases": 7,
+  "n_correct": 7,
+  "accuracy": 1.0,
+  "accuracy_pct": 100.0,
+  "predictor": "naive_keyword_predict",
+  "disclaimer": "Offline demo score only — not a claim of clinical CDS performance.",
+  "results": [
+    {
+      "id": "case_chest_pain",
+      "complaint": "Chest pain with diaphoresis",
+      "expected_esi": 2,
+      "predicted_esi": 2,
+      "correct": true
+    },
+    {
+      "id": "case_knee_pain",
+      "complaint": "Chronic knee pain",
+      "expected_esi": 4,
+      "predicted_esi": 4,
+      "correct": true
+    },
+    {
+      "id": "case_fever",
+      "complaint": "Fever 38.9 C for two days, otherwise stable",
+      "expected_esi": 4,
+      "predicted_esi": 4,
+      "correct": true
+    },
+    {
+      "id": "case_cardiac_arrest",
+      "complaint": "Unresponsive, no pulse, CPR in progress",
+      "expected_esi": 1,
+      "predicted_esi": 1,
+      "correct": true
+    },
+    {
+      "id": "case_minor_laceration",
+      "complaint": "Small finger laceration, bleeding controlled",
+      "expected_esi": 5,
+      "predicted_esi": 5,
+      "correct": true
+    },
+    {
+      "id": "case_abdominal_pain",
+      "complaint": "Severe abdominal pain, needs labs and imaging",
+      "expected_esi": 3,
+      "predicted_esi": 3,
+      "correct": true
+    },
+    {
+      "id": "case_shortness_of_breath",
+      "complaint": "Sudden shortness of breath and chest tightness",
+      "expected_esi": 2,
+      "predicted_esi": 2,
+      "correct": true
+    }
+  ]
+}

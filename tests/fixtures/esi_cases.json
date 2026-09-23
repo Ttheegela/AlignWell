@@ -1,0 +1,10 @@
+[
+  {"id": "chest_pain", "complaint": "Chest pain with diaphoresis", "expected_esi": 2, "notes": "demo scenario 1"},
+  {"id": "knee_pain", "complaint": "Chronic knee pain", "expected_esi": 4, "notes": "demo scenario 2"},
+  {"id": "fever", "complaint": "Fever 38.9C otherwise stable", "expected_esi": 4, "notes": "demo scenario 3"},
+  {"id": "anaphylaxis", "complaint": "Anaphylaxis airway compromise", "expected_esi": 1, "notes": "immediate"},
+  {"id": "abdominal", "complaint": "Severe abdominal pain unstable vitals", "expected_esi": 2, "notes": "emergent"},
+  {"id": "rash", "complaint": "Mild rash no systemic symptoms", "expected_esi": 5, "notes": "non-urgent"},
+  {"id": "fracture", "complaint": "Suspected ankle fracture ambulatory", "expected_esi": 3, "notes": "urgent"},
+  {"id": "uri", "complaint": "URI cough congestion", "expected_esi": 5, "notes": "non-urgent"}
+]
