@@ -102,3 +102,12 @@ pytest tests/ -v
 | 3 | Urgent | Stable, needs resources | Book specialist |
 | 4 | Less Urgent | Stable, one resource | Book primary care |
 | 5 | Non-Urgent | No resources needed | Book or waitlist |
+
+## Upgrade scaffold (v1)
+
+Landed on branch `upgrade/v1-scaffold` (see `UPGRADE_V1.md` for full inventory):
+
+- **Safety / verification stub** — `graph/safety_node.py` (`verify_triage`): PHI key redaction + ESI range / escalation checks. Pure Python stub; not clinical CDS.
+- **ESI offline eval** — `tests/fixtures/esi_cases.json` + `evals/esi_harness.py` (naive keyword demo predictor, no API key). Run: `python evals/esi_harness.py`
+
+**Next hooks (not implemented):** CDS Hooks, SMART-on-FHIR, OpenFDA drug-interaction tool.
